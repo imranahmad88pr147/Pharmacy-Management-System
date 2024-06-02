@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Bill</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('/img/bg1.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+         .navbar {
+            display: block; /* Override display flex */
+        }
+
+    /* Updated CSS for Navbar and Footer */
+.navbar, .footer {
+    background-color: #0e548e;
+    color: white;
+    text-align: center;
+    flex: 0 0 auto;
+    padding: 0; /* Remove padding to match Medicine Orders page */
+}
+
+.navbar a, .footer a {
+    display: inline-block;
+    color: white;
+    text-align: center;
+    padding: 12px 20px;
+    text-decoration: none;
+    font-size: 17px;
+}
+
+
+.navbar a:last-child, .footer a:last-child {
+    margin-right: 0; /* Remove right margin for the last button */
+}
+
+.footer {
+    margin-top: auto;
+}
+.footer{
+            padding: 3px;
+        }
+
+.navbar a:hover, .footer a:hover {
+    background-color: #4169e1;
+}
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group::after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+
+        .form-group label {
+            float: left;
+            width: 30%;
+        }
+
+        .form-group input,
+        .form-group select {
+            float: left;
+            width: 70%;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+
+        .form-group.dual input,
+        .form-group.dual select {
+            width: calc(50% - 2px);
+            margin-right: 4px;
+        }
+
+        .form-group.dual input:last-child,
+        .form-group.dual select:last-child {
+            margin-right: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        button[type="submit"] {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        #totalPrice {
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        #saveBillBtn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #saveBillBtn:hover {
+            background-color: #45a049;
+        }
+
+        .search-form {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .search-form input[type="text"] {
+            padding: 10px;
+            font-size: 16px;
+            width: 70%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .search-form button[type="submit"] {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .search-form button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="navbar">
+        <a href="/">Home</a>
+        <a href="/views/medorder">Medicine Order</a>
+        <a href="/medications">Inventory</a>
+        <a href="/bills">Billing</a>
+        <a href="/customer-record">Customer Record Management</a>
+        <a href="/salesreport">Sales Report</a>
+    </div>
+
+    <div class="container">
+        <h1>Create Bill</h1>
+        <form action="/create-bill" method="POST" id="billForm">
+            <div class="form-group">
+                <label for="medicationId">Medication ID:</label>
+                <input type="text" id="medicationId" name="medicationId">
+            </div>
+            <div class="form-group">
+                <label for="quantity">Quantity:</label>
+                <input type="number" id="quantity" name="quantity" min="1" value="1">
+            </div>
+            <button type="submit">Add Medicine</button>
+        </form>
+
+        <div id="selectedMedicines">
+            <h3>Selected Medicines:</h3>
+            <table id="selectedMedicinesTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Selected medicines will be dynamically added here -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="form-group">
+            <label for="total">Total Price:</label>
+            <span id="totalPrice">0 PKR</span>
+        </div>
+
+        <button id="saveBillBtn">Save Bill</button>
+    </div>
+
+
+
+    <div class="footer">
+        <p>&copy; 2024 Medicos Pharmacy. All rights reserved.</p>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+   <script>
+    // JavaScript code goes here
+    $(document).ready(function() {
+        let selectedMedicines = []; // Array to store selected medicines
+
+        // Function to update the total price
+        const updateTotalPrice = () => {
+            let totalPrice = selectedMedicines.reduce((acc, curr) => acc + curr.subtotal, 0);
+            $('#totalPrice').text(' PKR' + totalPrice.toFixed(2)); // Display total price
+        };
+
+        // Event listener for the form submission
+        $('#billForm').submit(function(event) {
+            event.preventDefault(); // Prevent form submission
+            let medicationId = $('#medicationId').val();
+            let quantity = parseInt($('#quantity').val());
+
+            // Make AJAX request to fetch medication details
+            $.get(`/medications/${medicationId}`, function(medication) {
+                if (medication && medication.name && medication.price) {
+                    // Calculate subtotal
+                    let subtotal = medication.price * quantity;
+
+                    // Add selected medication to the list
+                    selectedMedicines.push({
+                        medication_id: medicationId, // Use medication_id instead of id
+                        name: medication.name,
+                        price: medication.price,
+                        quantity: quantity,
+                        subtotal: subtotal
+                    });
+
+                    // Update selected medicines table
+                    $('#selectedMedicinesTable tbody').empty(); // Clear previous table rows
+                    selectedMedicines.forEach(function(item) {
+                        $('#selectedMedicinesTable tbody').append(`
+                            <tr>
+                                <td>${item.name}</td>
+                                <td>PKR ${item.price}</td>
+                                <td>${item.quantity}</td>
+                                <td>PKR ${item.subtotal.toFixed(2)}</td>
+                            </tr>
+                        `);
+                    });
+
+                    // Update total price
+                    updateTotalPrice();
+                } else {
+                    console.error('Error fetching medication details: Medication details not found or incomplete');
+                    alert('Error fetching medication details: Medication details not found or incomplete');
+                }
+            }).fail(function(xhr, status, error) {
+                console.error('Error fetching medication details:', error);
+                alert('Error fetching medication details. Please try again later.');
+            });
+        });
+
+        // Event listener for confirming the bill
+        $('#saveBillBtn').click(function() {
+            console.log('Save Bill button clicked'); // Log to check if the button click event is triggered
+            console.log('Selected Medicines:', selectedMedicines); // Log the selected medicines array
+
+            // Make AJAX request to save and confirm the bill
+            $.post('/process-bill', { selectedMedicines: selectedMedicines }, function(response) {
+                console.log('Response from server:', response); // Log the response from the server
+                $('#receiptContainer').html(response); // Display the response as receipt
+                // Clear selected medicines table and total price
+                selectedMedicines = [];
+                $('#selectedMedicinesTable tbody').empty();
+                $('#totalPrice').text('PKR 0.00');
+                // Display success message
+                alert('Bill processed successfully!');
+            }).fail(function(xhr, status, error) {
+                console.error('Error processing the bill:', error);
+                alert('Error processing the bill. Please try again later.');
+            });
+        });
+
+    });
+</script>
+
+</body>
+
+</html>

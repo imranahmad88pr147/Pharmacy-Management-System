@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Report</title>
+    <style>
+        /* Add your CSS styles here */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            background-image: url('/img/bg1.jpg');
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .navbar, .footer {
+            background-color: #0e548e; /* Blue color */
+            color: white;
+            text-align: center;
+            flex: 0 0 auto; /* Allow navbar and footer to shrink if content grows */
+        }
+
+        .navbar a, .footer a {
+            display: inline-block;
+            color: white;
+            text-align: center;
+            padding: 14px 20px;
+            text-decoration: none;
+            font-size: 17px;
+        }
+
+        .footer {
+            margin-top: auto; /* Push footer to the bottom */
+        }
+
+        .navbar a:hover, .footer a:hover {
+            background-color: #4169e1; /* Darker blue color on hover */
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .report-section {
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: #0e548e;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #4169e1;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #0e548e;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="navbar">
+        <a href="/">Home</a>
+        <a href="/views/medorder">Medicine Order</a>
+        <a href="/medications">Inventory</a>
+        <a href="/bills">Billing</a>
+        <a href="/customer-record">Customer Record Management</a>
+        <a href="/salesreport">Sales Report</a>
+    </div>
+
+    <h1 style="text-align: center; margin-top: 20px;">Sales Report</h1>
+
+    <!-- Yearly Sales Report -->
+    <div class="container">
+        <div class="report-section">
+            <h2>Yearly Sales Report</h2>
+            <label for="year">Select Year:</label>
+            <select id="yearDropdownYearly">
+                <option value="2023">2023</option>
+                <option value="2024">2024</option>
+            </select>
+            <button onclick="generateYearlyReport()">Generate Yearly Report</button>
+            <div id="yearlyReport"></div>
+        </div>
+    </div>
+
+    <!-- Monthly Sales Report -->
+    <div class="container">
+        <div class="report-section">
+            <h2>Monthly Sales Report</h2>
+            <label for="year">Select Year:</label>
+            <select id="yearDropdownMonthly">
+                <option value="2023">2023</option>
+                <option value="2024">2024</option>
+            </select>
+            <label for="month">Select Month:</label>
+            <select id="monthDropdownMonthly">
+                <option value="1">January</option>
+                <option value="2">February</option>
+                <option value="3">March</option>
+                <option value="4">April</option>
+                <option value="5">May</option>
+                <option value="6">June</option>
+                <option value="7">July</option>
+                <option value="8">August</option>
+                <option value="9">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+            </select>
+            <button onclick="generateMonthlyReport()">Generate Monthly Report</button>
+            <div id="monthlyReport"></div>
+        </div>
+    </div>
+
+    <script>
+        // Add your JavaScript code here
+        function generateYearlyReport() {
+            const selectedYear = document.getElementById('yearDropdownYearly').value;
+            fetch(`/yearly-sales-report?year=${selectedYear}`)
+                .then(response => response.json())
+                .then(data => {
+                    const yearlyReportContainer = document.getElementById('yearlyReport');
+                    yearlyReportContainer.innerHTML = `
+                        <p>Total Sales for ${selectedYear}: Rs.${data.totalSales.toFixed(2)}</p>
+                        <p>Average Sales per Month: Rs.${data.averageSalePerMonth.toFixed(2)}</p>
+                        <h3>Sales Table for ${selectedYear}</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Sales Date</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${data.salesData.map(sale => `
+                                    <tr>
+                                        <td>${new Date(sale.sales_date).toLocaleDateString()}</td>
+                                        <td>Rs.${sale.amount.toFixed(2)}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    `;
+                })
+                .catch(error => {
+                    console.error('Error fetching yearly sales report:', error);
+                    alert('Error generating yearly sales report. Please try again later.');
+                });
+        }
+
+        function generateMonthlyReport() {
+            const selectedYear = document.getElementById('yearDropdownMonthly').value;
+            const selectedMonth = document.getElementById('monthDropdownMonthly').value;
+            fetch(`/monthly-sales-report?year=${selectedYear}&month=${selectedMonth}`)
+                .then(response => response.json())
+                .then(data => {
+                    const monthlyReportContainer = document.getElementById('monthlyReport');
+                    monthlyReportContainer.innerHTML = `
+                        <p>Total Sales: Rs.${data.totalSales.toFixed(2)}</p>
+                        <p>Average Sale per Day: Rs.${data.averageSalePerDay.toFixed(2)}</p>
+                        <h3>Sales Table for ${selectedYear}-${selectedMonth}</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Sales Date</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${data.salesData.map(sale => `
+                                    <tr>
+                                        <td>${new Date(sale.sales_date).toLocaleDateString()}</td>
+                                        <td>Rs.${sale.amount.toFixed(2)}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    `;
+                })
+                .catch(error => {
+                    console.error('Error fetching monthly sales report:', error);
+                    alert('Error generating monthly sales report. Please try again later.');
+                });
+        }
+    </script>
+
+    <div class="footer">
+        <p>&copy; 2024 Medicos Pharmacy. All rights reserved.</p>
+    </div>
+</body>
+
+</html>

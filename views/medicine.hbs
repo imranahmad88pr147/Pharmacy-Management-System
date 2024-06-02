@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medications</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('/img/bg.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white background */
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px); /* Apply blur effect to the background */
+        }
+
+        .title {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* Navbar and Footer Styles */
+        .navbar, .footer {
+            background-color: #0e548e;
+            color: white;
+            text-align: center;
+            flex: 0 0 auto;
+        }
+
+        .navbar a, .footer a {
+            display: inline-block;
+            color: white;
+            text-align: center;
+            padding: 14px 20px;
+            text-decoration: none;
+            font-size: 17px;
+        }
+
+        .footer {
+            margin-top: auto;
+        }
+
+        .navbar a:hover, .footer a:hover {
+            background-color: #4169e1;
+        }
+
+        /* Form Styles */
+        form {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        textarea,
+        input[type="date"],
+        input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button[type="submit"] {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            position: relative;
+            z-index: 0; /* Ensure the table content is above the blurred background */
+        }
+
+        table::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: inherit;
+            filter: blur(2px); /* Apply blur effect to the background */
+            z-index: -1; /* Place the pseudo-element behind the table content */
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .delete-button {
+            padding: 8px 16px;
+            font-size: 14px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .delete-button:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <a href="/">Home</a>
+    <a href="/views/medorder">Medicine Order</a>
+    <a href="/medications">Inventory</a>
+    <a href="/bills">Billing</a>
+    <a href="/customer-record">Customer Record Management</a>
+    <a href="/salesreport">Sales Report</a>
+</div>
+
+<div class="container">
+    <h1 class="title">Medications</h1>
+
+    <!-- Add New Medicine Form -->
+    <form action="/medications/add" method="POST">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+
+        <label for="description">Description:</label>
+        <textarea id="description" name="description" rows="4" required></textarea>
+
+        <label for="expiry_date">Expiry Date:</label>
+        <input type="date" id="expiry_date" name="expiry_date" required>
+
+        <label for="price">Price:</label>
+        <input type="number" id="price" name="price" required>
+
+        <label for="quantity">Quantity:</label>
+        <input type="number" id="quantity" name="quantity" required>
+
+        <button type="submit">Add Medicine</button>
+    </form>
+
+    <!-- Search Form -->
+    <form action="/medications" method="GET">
+        <input type="text" id="search" name="search" placeholder="Enter medication name">
+        <button type="submit">Search</button>
+    </form>
+
+    <!-- Medications Table -->
+    <table>
+        <thead>
+            <tr>
+                <th>Medication ID</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Expiry Date</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each medications}}
+            <tr>
+                <td>{{medication_id}}</td>
+                <td>{{name}}</td>
+                <td>{{description}}</td>
+                <td>{{expiry_date}}</td>
+                <td>{{price}}</td>
+                <td>{{quantity}}</td>
+                <td>
+                    <button class="delete-button" onclick="confirmDelete('{{medication_id}}')">Delete</button>
+                    <form id="deleteForm_{{medication_id}}" action="/medications/delete/{{medication_id}}" method="POST" style="display: none;">
+                </td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</div>
+
+<div class="footer">
+    <p>&copy; 2024 Medicos Pharmacy. All rights reserved.</p>
+</div>
+
+<script>
+    // Function to fetch filtered results based on search input
+    const searchMedications = async () => {
+        const searchInput = document.getElementById('search').value;
+        const response = await fetch(`/medications?search=${searchInput}`);
+        const data = await response.text();
+        // Replace medications table content with filtered results
+        document.getElementById('medicationsTable').innerHTML = data;
+    };
+
+    // Function to confirm medicine deletion
+    const confirmDelete = (medicationId) => {
+        if (confirm('Are you sure you want to delete this medicine?')) {
+            const deleteForm = document.getElementById(`deleteForm_${medicationId}`);
+            deleteForm.submit(); // Submit delete form
+            alert('Medicine deleted successfully!');
+        }
+    };
+
+    // Attach event listener to search input for dynamic searching
+    document.getElementById('search').addEventListener('input', searchMedications);
+
+    // Function to format date
+    const formatDate = (date) => {
+        return new Date(date).toDateString();
+    };
+</script>
+
+</body>
+</html>
